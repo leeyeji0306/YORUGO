@@ -1,0 +1,20 @@
+{
+  "name": "yorugo",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/leeyeji0306/YORUGO#readme",
+  "bugs": {
+    "url": "https://github.com/leeyeji0306/YORUGO/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/leeyeji0306/YORUGO.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
