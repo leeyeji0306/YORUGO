@@ -1,19 +1,2 @@
-# React + Vite
-
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
-
-Currently, two official plugins are available:
-
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
-
-## React Compiler
-
-The React Compiler is enabled on this template. See [this documentation](https://react.dev/learn/react-compiler) for more information.
-
-Note: This will impact Vite dev & build performances.
-You can also try [the experimental native React Compiler support in plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md#rust-react-compiler) by using `compiler: true` in the plugin options instead of using the Babel plugin.
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+📝 Commit Convention우리는 읽기 쉽고 명확한 Git 히스토리를 위해 아래의 커밋 메시지 규칙을 준수합니다.📌 메시지 구조Plaintext태그: 작업 내용 요약
+예시: feat: 로그인 기능 구현, fix: 메인 페이지 버그 수정🏷️ 커밋 태그 (Commit Type)태그 (Type)설명 (Description)사용 예시feat새로운 기능 추가feat: 카카오 소셜 로그인 기능 추가fix버그 수정fix: 네비게이션 바 모바일 뷰 깨짐 수정docs문서 수정 (README 등)docs: 커밋 컨벤션 내용 추가style코드 포맷팅, 세미콜론 누락 등 (로직 변경 X)style: App.jsx Indent 및 줄바꿈 정리refactor코드 리팩토링 (기능 변경 없이 성능/구조 개선)refactor: UserCard 컴포넌트 분리test테스트 코드 추가 및 수정test: 회원가입 유효성 검사 테스트 작성chore빌드 업무, 패키지 매니저 설정, 기타 잡동사니chore: axios 라이브러리 추가⚠️ 작성 규칙태그는 소문자로 작성합니다.태그 뒤에는 콜론과 공백 한 칸(: )을 둡니다.제목 끝에는 마침표(.)를 찍지 않습니다.개별 파일 단위보다는 작업 기능 단위로 커밋합니다.
