@@ -19,7 +19,8 @@ html {
 body {
   display: flex;
   justify-content: center;
-  width: 390px;
+  min-width: 390px;
+  max-width: 450px;
   height: 100%;
   background-color: var(--white);
   margin: 0 auto;

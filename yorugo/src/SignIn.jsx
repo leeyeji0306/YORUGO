@@ -1,5 +1,6 @@
 import styled from "styled-components";
 import logo from "./assets/logo.svg";
+import { Link } from "react-router-dom";
 
 export default function SignIn() {
   return (
@@ -9,14 +10,16 @@ export default function SignIn() {
         <InforInput type="text" placeholder="이메일을 입력해주세요." />
         <InforInput type="password" placeholder="비밀번호을 입력해주세요." />
         <SigninButton>로그인</SigninButton>
-        <div
+        <Link
+          to="/signUp"
           style={{
             marginTop: "25px",
             fontSize: "13px",
+            color: "var(--gray-35)",
           }}
         >
           회원가입
-        </div>
+        </Link>
       </SigninContainer>
     </>
   );
@@ -55,4 +58,5 @@ const SigninButton = styled.button`
   background-color: var(--main-color);
   border: none;
   border-radius: 6px;
+  color: var(--white);
 `;
