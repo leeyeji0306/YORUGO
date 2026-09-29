@@ -6,8 +6,8 @@ export default function SignUp() {
       <div
         style={{
           width: "340px",
-          marginTop: "70px",
-          fontSize: "17px",
+          marginTop: "90px",
+          fontSize: "20px",
           fontWeight: 600,
           marginBottom: "40px",
         }}
@@ -71,7 +71,7 @@ const SignupContainer = styled.div`
 
 const InputContainer = styled.div`
   display: inline-block;
-  margin-bottom: 30px;
+  margin-bottom: 32px;
 `;
 
 const InfoInput = styled.input`
@@ -84,7 +84,7 @@ const InfoInput = styled.input`
 `;
 
 const SignupButton = styled.button`
-  margin-top: 100px;
+  margin-top: 103px;
   width: 100%;
   height: 50px;
   background-color: var(--main-color);

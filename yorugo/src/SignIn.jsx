@@ -26,11 +26,10 @@ export default function SignIn() {
 }
 
 const SigninContainer = styled.div`
-  margin-top: 184px;
+  margin-top: 204px;
   display: flex;
   flex-direction: column;
   width: 340px;
-  height: 332px;
   justify-content: center;
   align-items: center;
 `;
