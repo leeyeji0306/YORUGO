@@ -58,11 +58,112 @@ const TIME_OPTIONS = Array.from({ length: 24 }, (_, i) => {
   return `${hour}:00`;
 });
 
+const getMarkerIcon = (openTime, closeTime, now) => {
+  const [openHour, openMinute] = openTime
+    .slice(0, 5)
+    .split(":")
+    .map(Number);
+
+  const [closeHour, closeMinute] = closeTime
+    .slice(0, 5)
+    .split(":")
+    .map(Number);
+
+  const open = new Date(now);
+  const close = new Date(now);
+
+  open.setHours(openHour, openMinute, 0, 0);
+  close.setHours(closeHour, closeMinute, 0, 0);
+
+  // 영업 종료 시간이 시작 시간보다 빠르면
+  // 다음 날에 영업 종료
+  if (close <= open) {
+    close.setDate(close.getDate() + 1);
+  }
+
+  // 현재 시간이 영업 시작 전이면
+  if (now < open) {
+    return MARKER_ICONS.CLOSED;
+  }
+
+  // 영업 종료
+  if (now >= close) {
+    return MARKER_ICONS.CLOSED;
+  }
+
+  // 종료 1시간 전
+  const oneHourBefore = new Date(close);
+  oneHourBefore.setHours(oneHourBefore.getHours() - 1);
+
+  if (now >= oneHourBefore) {
+    return MARKER_ICONS.CLOSING_SOON;
+  }
+
+  return MARKER_ICONS.OPEN;
+};
+
+const timeToMinutes = (time) => {
+  let [hour, minute] = time.slice(0, 5).split(":").map(Number);
+
+  if (hour === 24) {
+    hour = 0;
+  }
+
+  return hour * 60 + minute;
+};
+
+const isOpenNow = (openTime, closeTime, now) => {
+  const openMinutes = timeToMinutes(openTime);
+  const closeMinutes = timeToMinutes(closeTime);
+
+  const currentMinutes =
+    now.getHours() * 60 + now.getMinutes();
+
+  // 자정을 넘어가는 영업시간
+  // 예: 17:00 ~ 04:00
+  if (closeMinutes <= openMinutes) {
+    return (
+      currentMinutes >= openMinutes ||
+      currentMinutes < closeMinutes
+    );
+  }
+
+  // 일반적인 영업시간
+  return (
+    currentMinutes >= openMinutes &&
+    currentMinutes < closeMinutes
+  );
+};
+
+const isWithinSelectedTime = (item, selectedTime) => {
+  const storeOpen = timeToMinutes(item.open_time);
+  const storeClose = timeToMinutes(item.close_time);
+
+  const selectedStart = timeToMinutes(selectedTime.start);
+  const selectedEnd = timeToMinutes(selectedTime.end);
+
+  // 자정을 넘어가는 가게
+  if (storeClose <= storeOpen) {
+    return (
+      selectedStart >= storeOpen ||
+      selectedEnd <= storeClose
+    );
+  }
+
+  // 일반적인 가게
+  return (
+    selectedStart >= storeOpen &&
+    selectedEnd <= storeClose
+  );
+};
+
+
+
 function Home({ user }) {
-  const defaultCenter = [35.170915, 136.881537];
+  const defaultCenter = [35.17037150029941, 136.90086349316044];
   const [mapCenter, setMapCenter] = useState(defaultCenter);
   const [userLocation, setUserLocation] = useState(null);
-  const [zoomLevel, setZoomLevel] = useState(14);
+  const [zoomLevel, setZoomLevel] = useState(17.5);
   const [loading, setLoading] = useState(false);
   const [restaurant, setRestaurant] = useState([]);
   const navigate = useNavigate();
@@ -103,6 +204,22 @@ function Home({ user }) {
     window.addEventListener("touchmove", handleDragMove);
     window.addEventListener("touchend", handleDragEnd);
   };
+
+  // // 테스트 시간 
+  // const testTime = new Date();
+  // testTime.setHours(19, 0, 0, 0);
+
+  // const [currentTime, setCurrentTime] = useState(testTime);
+
+  const [currentTime, setCurrentTime] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date());
+    }, 60000);
+
+    return () => clearInterval(timer);
+  }, []);
 
   const handleDragMove = (e) => {
     if (!dragInfo.current.dragging) return;
@@ -161,6 +278,33 @@ function Home({ user }) {
     fetchRestaurant();
   }, []);
 
+
+
+const filteredRestaurants = restaurant.filter((item) => {
+  // if (!isOpenNow(item.open_time, item.close_time, currentTime)) {
+  //   return false;
+  // }
+
+  if (isCardSelected && item.card !== true) {
+    return false;
+  }
+
+  if (isCashSelected && item.cash !== true) {
+  return false;
+  }
+
+  if (
+    isTimeSelected &&
+    !isWithinSelectedTime(item, selectedTime)
+  ) {
+    return false;
+  }
+
+  return true;
+});
+
+
+
   // ⏰ 시간 유효성 검사 및 적용 핸들러
   const handleApplyTime = () => {
     // "19:00" 형태의 문자열에서 앞의 시간 숫자("19")만 잘라내어 정수로 변환
@@ -216,7 +360,18 @@ function Home({ user }) {
               radius={200}
             />
           )}
-          <Marker position={defaultCenter} />
+
+          {restaurant.map((item) => (
+            <Marker
+              key={item.store_id}
+              position={[item.lat, item.lng]}
+              icon={getMarkerIcon(
+                item.open_time,
+                item.close_time,
+                currentTime
+              )}
+            />
+          ))}
         </MapContainer>
 
         {/* 🔍 지도 위에 오버레이되는 반투명 헤더 */}
@@ -320,7 +475,7 @@ function Home({ user }) {
         ></div>
         <h2 className="sheet-title">주변 영업 중인 가게</h2>
         <div className="shop-list">
-          {restaurant.map((item) => (
+          {filteredRestaurants.map((item) => (
             <div className="shop-item">
               <div className="shop-img-placeholder">
                 <img src={item.img_url} alt="" className="rst_img" />
@@ -335,7 +490,7 @@ function Home({ user }) {
                   </span>
                 </div>
                 <div className="shop-status">
-                  <span className="status-badge open">영업 중</span>
+                  <span className={isOpenNow(item.open_time,item.close_time,currentTime) ? "status-badge open " : "status-badge closed"}>{isOpenNow(item.open_time,item.close_time,currentTime) ? "영업 중" : "영업 종료"}</span>
                   <span className="status-time">
                     ~ {item.close_time.slice(0, 5)}
                   </span>
