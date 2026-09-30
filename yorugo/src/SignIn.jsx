@@ -10,7 +10,7 @@ export default function SignIn({ setUser }) {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
   async function clickSignInButton() {
-    const { data, error } = supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });

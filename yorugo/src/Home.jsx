@@ -11,6 +11,7 @@ import openMarkerSvg from "./assets/Open.svg";
 import closingSoonSvg from "./assets/SoonClosing.svg";
 import closedMarkerSvg from "./assets/Closed.svg";
 import { supabase } from "./supabase.js";
+import { useNavigate } from "react-router-dom";
 
 const MAIN_COLOR = "#fb86a3";
 
@@ -64,6 +65,7 @@ function Home({ user }) {
   const [zoomLevel, setZoomLevel] = useState(14);
   const [loading, setLoading] = useState(false);
   const [restaurant, setRestaurant] = useState([]);
+  const navigate = useNavigate();
 
   // 카테고리 선택 상태
   const [isTimeSelected, setIsTimeSelected] = useState(false);
@@ -141,34 +143,50 @@ function Home({ user }) {
   };
 
   async function fetchRestaurant() {
-  const { data, error } = await supabase.from("restaurant").select("*");
+    const { data, error } = await supabase.from("restaurant").select("*");
 
-  if (error) {
-    console.log("오류 : ", error);
-  } else {
-    setRestaurant(data);
+    if (error) {
+      console.log("오류 : ", error);
+    } else {
+      setRestaurant(data);
+    }
+
+    console.log(data);
   }
 
-  console.log(data);
-}
-
-
-  
   useEffect(() => {
     fetchUserLocation();
   }, []);
   useEffect(() => {
-  fetchRestaurant();
-}, []);
-  
+    fetchRestaurant();
+  }, []);
 
+  // ⏰ 시간 유효성 검사 및 적용 핸들러
   const handleApplyTime = () => {
+    // "19:00" 형태의 문자열에서 앞의 시간 숫자("19")만 잘라내어 정수로 변환
+    const startHour = parseInt(tempStart.split(":")[0], 10);
+    const endHour = parseInt(tempEnd.split(":")[0], 10);
+
+    // 시작 시간이 종료 시간보다 크거나 같으면 경고창을 띄우고 함수 종료
+    if (startHour >= endHour) {
+      alert("시작 시간은 종료 시간보다 빨라야 합니다!");
+      return;
+    }
+
+    // 검증 통과 시 시간 상태 업데이트 및 모달 닫기
     setSelectedTime({ start: tempStart, end: tempEnd });
     setIsTimeModalOpen(false);
   };
 
-  const handleLogout = () => {
-    alert("로그아웃 되었습니다.");
+  const handleLogout = async () => {
+    const { data, error } = await supabase.auth.signOut();
+    if (error) {
+      alert("로그아웃에 실패하였습니다.");
+    } else {
+      alert("로그아웃 되었습니다.");
+      navigate("/");
+    }
+
     setIsProfileMenuOpen(false);
   };
 
@@ -304,21 +322,34 @@ function Home({ user }) {
         <div className="shop-list">
           {restaurant.map((item) => (
             <div className="shop-item">
-              <div className="shop-img-placeholder"><img src = {item.img_url} alt="" className="rst_img"/></div>
+              <div className="shop-img-placeholder">
+                <img src={item.img_url} alt="" className="rst_img" />
+              </div>
               <div className="shop-info">
                 <h3 className="shop-name">{item.jpn_name}</h3>
                 <p className="shop-kana">{item.eng_name}</p>
                 <div className="shop-rating">
-                  ⭐ <span className="rating-score">{item.avg_star}({item.review_cnt})</span>
+                  ⭐{" "}
+                  <span className="rating-score">
+                    {item.avg_star}({item.review_cnt})
+                  </span>
                 </div>
                 <div className="shop-status">
                   <span className="status-badge open">영업 중</span>
-                  <span className="status-time">~ {item.close_time.slice(0,5)}</span>
+                  <span className="status-time">
+                    ~ {item.close_time.slice(0, 5)}
+                  </span>
                   <span className="status-divider">|</span>
                   <div className="pay-icons">
                     <span className="pay-icon">
-                      <img src={item.cash === true ? Cash : ""}  className="cash"/>
-                      <img src={item.card === true ? Card : ""} className="card"/>
+                      <img
+                        src={item.cash === true ? Cash : ""}
+                        className="cash"
+                      />
+                      <img
+                        src={item.card === true ? Card : ""}
+                        className="card"
+                      />
                     </span>
                   </div>
                 </div>
