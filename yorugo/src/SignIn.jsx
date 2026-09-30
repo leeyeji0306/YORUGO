@@ -5,7 +5,7 @@ import { useState } from "react";
 import { supabase } from "./supabase";
 import { useNavigate } from "react-router-dom";
 
-export default function SignIn() {
+export default function SignIn({ setUser }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
@@ -22,6 +22,7 @@ export default function SignIn() {
       const {
         data: { user },
       } = await supabase.auth.getUser();
+      setUser(user);
       console.log("현재 로그인된 유저 : ", user);
       navigate("/home");
     }

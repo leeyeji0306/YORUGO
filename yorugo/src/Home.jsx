@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react"; // 이거 하나만 남기기
 import { MapContainer, TileLayer, Circle, Marker, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
@@ -10,6 +10,7 @@ import Card from "./assets/Card.svg";
 import openMarkerSvg from "./assets/Open.svg";
 import closingSoonSvg from "./assets/SoonClosing.svg";
 import closedMarkerSvg from "./assets/Closed.svg";
+import { supabase } from "./supabase.js";
 
 const MAIN_COLOR = "#fb86a3";
 
@@ -56,12 +57,13 @@ const TIME_OPTIONS = Array.from({ length: 24 }, (_, i) => {
   return `${hour}:00`;
 });
 
-function Home() {
+function Home({ user }) {
   const defaultCenter = [35.170915, 136.881537];
   const [mapCenter, setMapCenter] = useState(defaultCenter);
   const [userLocation, setUserLocation] = useState(null);
   const [zoomLevel, setZoomLevel] = useState(14);
   const [loading, setLoading] = useState(false);
+  const [restaurant, setRestaurant] = useState([]);
 
   // 카테고리 선택 상태
   const [isTimeSelected, setIsTimeSelected] = useState(false);
@@ -79,6 +81,43 @@ function Home() {
   const [tempStart, setTempStart] = useState("19:00");
   const [tempEnd, setTempEnd] = useState("24:00");
   const [isTimeModalOpen, setIsTimeModalOpen] = useState(false);
+
+  // 바텀시트 드래그 관련
+  const [sheetHeight, setSheetHeight] = useState(280); // 시트 초기 높이(px)
+  const dragInfo = useRef({ dragging: false, startY: 0, startHeight: 280 });
+
+  const MIN_HEIGHT = 120; // 최소로 접었을 때 높이
+  const MAX_HEIGHT = window.innerHeight * 0.85; // 최대로 폈을 때 높이
+
+  const handleDragStart = (e) => {
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    dragInfo.current = {
+      dragging: true,
+      startY: clientY,
+      startHeight: sheetHeight,
+    };
+    window.addEventListener("mousemove", handleDragMove);
+    window.addEventListener("mouseup", handleDragEnd);
+    window.addEventListener("touchmove", handleDragMove);
+    window.addEventListener("touchend", handleDragEnd);
+  };
+
+  const handleDragMove = (e) => {
+    if (!dragInfo.current.dragging) return;
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+    const delta = dragInfo.current.startY - clientY; // 위로 드래그하면 양수
+    let newHeight = dragInfo.current.startHeight + delta;
+    newHeight = Math.max(MIN_HEIGHT, Math.min(MAX_HEIGHT, newHeight));
+    setSheetHeight(newHeight);
+  };
+
+  const handleDragEnd = () => {
+    dragInfo.current.dragging = false;
+    window.removeEventListener("mousemove", handleDragMove);
+    window.removeEventListener("mouseup", handleDragEnd);
+    window.removeEventListener("touchmove", handleDragMove);
+    window.removeEventListener("touchend", handleDragEnd);
+  };
 
   const fetchUserLocation = () => {
     if (!navigator.geolocation) return;
@@ -101,9 +140,27 @@ function Home() {
     );
   };
 
+  async function fetchRestaurant() {
+  const { data, error } = await supabase.from("restaurant").select("*");
+
+  if (error) {
+    console.log("오류 : ", error);
+  } else {
+    setRestaurant(data);
+  }
+
+  console.log(data);
+}
+
+
+  
   useEffect(() => {
     fetchUserLocation();
   }, []);
+  useEffect(() => {
+  fetchRestaurant();
+}, []);
+  
 
   const handleApplyTime = () => {
     setSelectedTime({ start: tempStart, end: tempEnd });
@@ -171,8 +228,8 @@ function Home() {
                   />
                   <div className="profile-popup">
                     <div className="popup-user-info">
-                      <h4 className="user-name">조미료</h4>
-                      <p className="user-email">s1234@e-mirim.hs.kr</p>
+                      <h4 className="user-name">{user.user_metadata.name}</h4>
+                      <p className="user-email">{user.user_metadata.email}</p>
                     </div>
                     <div className="popup-divider" />
                     <button className="logout-btn" onClick={handleLogout}>
@@ -234,31 +291,41 @@ function Home() {
       </main>
 
       {/* 📥 하단 바텀 시트 */}
-      <footer className="shop-bottom-sheet">
-        <div className="sheet-handle"></div>
+      <footer
+        className="shop-bottom-sheet"
+        style={{ height: `${sheetHeight}px` }}
+      >
+        <div
+          className="sheet-handle"
+          onMouseDown={handleDragStart}
+          onTouchStart={handleDragStart}
+        ></div>
         <h2 className="sheet-title">주변 영업 중인 가게</h2>
         <div className="shop-list">
-          <div className="shop-item">
-            <div className="shop-img-placeholder">🍜</div>
-            <div className="shop-info">
-              <h3 className="shop-name">멘야키요 라멘</h3>
-              <p className="shop-kana">Menyakiyo Ramen</p>
-              <div className="shop-rating">
-                ⭐ <span className="rating-score">4.0 (840)</span>
-              </div>
-              <div className="shop-status">
-                <span className="status-badge open">영업 중</span>
-                <span className="status-time">~ 23:30</span>
-                <span className="status-divider">|</span>
-                <div className="pay-icons">
-                  <span className="pay-icon">
-                    <img src={Cash} />
-                  </span>
+          {restaurant.map((item) => (
+            <div className="shop-item">
+              <div className="shop-img-placeholder"><img src = {item.img_url} alt="" className="rst_img"/></div>
+              <div className="shop-info">
+                <h3 className="shop-name">{item.jpn_name}</h3>
+                <p className="shop-kana">{item.eng_name}</p>
+                <div className="shop-rating">
+                  ⭐ <span className="rating-score">{item.avg_star}({item.review_cnt})</span>
+                </div>
+                <div className="shop-status">
+                  <span className="status-badge open">영업 중</span>
+                  <span className="status-time">~ {item.close_time.slice(0,5)}</span>
+                  <span className="status-divider">|</span>
+                  <div className="pay-icons">
+                    <span className="pay-icon">
+                      <img src={item.cash === true ? Cash : ""}  className="cash"/>
+                      <img src={item.card === true ? Card : ""} className="card"/>
+                    </span>
+                  </div>
                 </div>
               </div>
+              <span className="item-arrow">〉</span>
             </div>
-            <span className="item-arrow">〉</span>
-          </div>
+          ))}
         </div>
       </footer>
 
