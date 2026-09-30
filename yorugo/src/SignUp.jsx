@@ -1,4 +1,5 @@
 import styled from "styled-components";
+import { supabase } from "./supabase";
 
 export default function SignUp() {
   return (
