@@ -10,8 +10,7 @@ import Card from "./assets/Card.svg";
 import openMarkerSvg from "./assets/Open.svg";
 import closingSoonSvg from "./assets/SoonClosing.svg";
 import closedMarkerSvg from "./assets/Closed.svg";
-import { supabase } from "./supabase";
-
+import { supabase } from "./supabase.js";
 
 const MAIN_COLOR = "#fb86a3";
 
@@ -58,7 +57,7 @@ const TIME_OPTIONS = Array.from({ length: 24 }, (_, i) => {
   return `${hour}:00`;
 });
 
-function Home() {
+function Home({ user }) {
   const defaultCenter = [35.170915, 136.881537];
   const [mapCenter, setMapCenter] = useState(defaultCenter);
   const [userLocation, setUserLocation] = useState(null);
@@ -229,8 +228,8 @@ function Home() {
                   />
                   <div className="profile-popup">
                     <div className="popup-user-info">
-                      <h4 className="user-name">조미료</h4>
-                      <p className="user-email">s1234@e-mirim.hs.kr</p>
+                      <h4 className="user-name">{user.user_metadata.name}</h4>
+                      <p className="user-email">{user.user_metadata.email}</p>
                     </div>
                     <div className="popup-divider" />
                     <button className="logout-btn" onClick={handleLogout}>

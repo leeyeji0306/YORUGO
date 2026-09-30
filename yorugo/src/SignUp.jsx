@@ -1,13 +1,44 @@
 import styled from "styled-components";
+import { supabase } from "./supabase.js";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function SignUp() {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [checkPassword, setCheckPassword] = useState("");
+  const navigate = useNavigate();
+  async function clickSignUpButton() {
+    if (checkPassword !== password) {
+      alert("비밀번호와 확인 비밀번호가 같지 않습니다.");
+    } else {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            name,
+          },
+        },
+      });
+
+      if (error) {
+        alert("회원가입 실패..");
+      } else {
+        alert("회원가입 성공!");
+        navigate("/");
+      }
+    }
+  }
+
   return (
     <SignupContainer>
       <div
         style={{
           width: "340px",
-          marginTop: "70px",
-          fontSize: "17px",
+          marginTop: "90px",
+          fontSize: "20px",
           fontWeight: 600,
           marginBottom: "40px",
         }}
@@ -22,7 +53,13 @@ export default function SignUp() {
         >
           이름
         </div>
-        <InfoInput type="text" placeholder="이름을 입력해주세요" />
+        <InfoInput
+          type="text"
+          placeholder="이름을 입력해주세요"
+          onChange={(e) => {
+            setName(e.target.value);
+          }}
+        />
       </InputContainer>
       <InputContainer>
         <div
@@ -32,7 +69,13 @@ export default function SignUp() {
         >
           이메일
         </div>
-        <InfoInput type="text" placeholder="이메일을 입력해주세요" />
+        <InfoInput
+          type="text"
+          placeholder="이메일을 입력해주세요"
+          onChange={(e) => {
+            setEmail(e.target.value);
+          }}
+        />
       </InputContainer>
       <InputContainer>
         <div
@@ -45,6 +88,9 @@ export default function SignUp() {
         <InfoInput
           type="password"
           placeholder="비밀번호 (영문, 숫자, 특수문자 8~20자)"
+          onChange={(e) => {
+            setPassword(e.target.value);
+          }}
         />
       </InputContainer>
       <InputContainer>
@@ -55,8 +101,14 @@ export default function SignUp() {
         >
           비밀번호 확인
         </div>
-        <InfoInput type="password" placeholder="비밀번호를 다시 입력해주세요" />
-        <SignupButton>가입하기</SignupButton>
+        <InfoInput
+          type="password"
+          placeholder="비밀번호를 다시 입력해주세요"
+          onChange={(e) => {
+            setCheckPassword(e.target.value);
+          }}
+        />
+        <SignupButton onClick={clickSignUpButton}>가입하기</SignupButton>
       </InputContainer>
     </SignupContainer>
   );
@@ -71,7 +123,7 @@ const SignupContainer = styled.div`
 
 const InputContainer = styled.div`
   display: inline-block;
-  margin-bottom: 30px;
+  margin-bottom: 32px;
 `;
 
 const InfoInput = styled.input`
@@ -84,7 +136,7 @@ const InfoInput = styled.input`
 `;
 
 const SignupButton = styled.button`
-  margin-top: 100px;
+  margin-top: 103px;
   width: 100%;
   height: 50px;
   background-color: var(--main-color);

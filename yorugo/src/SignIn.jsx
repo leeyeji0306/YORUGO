@@ -1,15 +1,52 @@
 import styled from "styled-components";
 import logo from "./assets/logo.svg";
 import { Link } from "react-router-dom";
+import { useState } from "react";
+import { supabase } from "./supabase";
+import { useNavigate } from "react-router-dom";
 
-export default function SignIn() {
+export default function SignIn({ setUser }) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const navigate = useNavigate();
+  async function clickSignInButton() {
+    const { data, error } = supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (error) {
+      alert("로그인을 실패하였습니다! 이메일과 비밀번호를 다시 확인해주세요");
+    } else {
+      alert("로그인에 성공하였습니다!");
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      setUser(user);
+      console.log("현재 로그인된 유저 : ", user);
+      navigate("/home");
+    }
+  }
+
   return (
     <>
       <SigninContainer>
         <LogoImg src={logo} />
-        <InforInput type="text" placeholder="이메일을 입력해주세요." />
-        <InforInput type="password" placeholder="비밀번호을 입력해주세요." />
-        <SigninButton>로그인</SigninButton>
+        <InforInput
+          type="text"
+          placeholder="이메일을 입력해주세요."
+          onChange={(e) => {
+            setEmail(e.target.value);
+          }}
+        />
+        <InforInput
+          type="password"
+          placeholder="비밀번호을 입력해주세요."
+          onChange={(e) => {
+            setPassword(e.target.value);
+          }}
+        />
+        <SigninButton onClick={clickSignInButton}>로그인</SigninButton>
         <Link
           to="/signUp"
           style={{
@@ -26,11 +63,10 @@ export default function SignIn() {
 }
 
 const SigninContainer = styled.div`
-  margin-top: 184px;
+  margin-top: 204px;
   display: flex;
   flex-direction: column;
   width: 340px;
-  height: 332px;
   justify-content: center;
   align-items: center;
 `;
