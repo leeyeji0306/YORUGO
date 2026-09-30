@@ -312,8 +312,8 @@
 }
 
 .shop-img-placeholder {
-  width: 70px;
-  height: 70px;
+  width: 90px;
+  height: 90px;
   border-radius: 12px;
   background-color: var(--gray-84);
   display: flex;
@@ -355,8 +355,8 @@
 }
 
 .status-badge.open {
-  background-color: rgba(251, 134, 163, 0.15);
-  color: var(--main-color);
+  background-color: #D7F5E1;
+  color: #35764C;
   padding: 2px 6px;
   border-radius: 5px;
   font-weight: bold;
@@ -475,4 +475,29 @@
   font-size: 15px;
   font-weight: bold;
   cursor: pointer;
+}
+
+.cash{
+  margin-right: 8.5px;
+}
+
+.rst_img{
+  width: 90px;
+  height: 90px;
+  object-fit: cover;
+  border-radius: 7px;
+}
+
+.sheet-handle {
+  cursor: grab;
+  touch-action: none; /* 모바일에서 드래그할 때 화면 스크롤이랑 충돌 방지 */
+}
+
+.sheet-handle:active {
+  cursor: grabbing;
+}
+
+.shop-bottom-sheet {
+  transition: height 0.1s ease-out; /* 부드럽게 움직이는 효과 (선택) */
+  overflow: hidden;
 }
