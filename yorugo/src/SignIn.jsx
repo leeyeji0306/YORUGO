@@ -3,11 +3,12 @@ import logo from "./assets/logo.svg";
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import { supabase } from "./supabase";
+import { useNavigate } from "react-router-dom";
 
 export default function SignIn() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
+  const navigate = useNavigate();
   async function clickSignInButton() {
     const { data, error } = supabase.auth.signInWithPassword({
       email,
@@ -22,6 +23,7 @@ export default function SignIn() {
         data: { user },
       } = await supabase.auth.getUser();
       console.log("현재 로그인된 유저 : ", user);
+      navigate("/home");
     }
   }
 
