@@ -1,12 +1,14 @@
 import styled from "styled-components";
 import { supabase } from "./supabase.js";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 export default function SignUp() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [checkPassword, setCheckPassword] = useState("");
+  const navigate = useNavigate();
   async function clickSignUpButton() {
     if (checkPassword !== password) {
       alert("비밀번호와 확인 비밀번호가 같지 않습니다.");
@@ -25,6 +27,7 @@ export default function SignUp() {
         alert("회원가입 실패..");
       } else {
         alert("회원가입 성공!");
+        navigate("/");
       }
     }
   }
