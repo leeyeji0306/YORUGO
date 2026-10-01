@@ -474,9 +474,12 @@ const filteredRestaurants = restaurant.filter((item) => {
           onMouseDown={handleDragStart}
           onTouchStart={handleDragStart}
         ></div>
-        <h2 className="sheet-title">주변 영업 중인 가게</h2>
+        <h2 className="sheet-title">{filteredRestaurants.length === 0 ? "" : "주변 영업 중인 가게"}</h2>
         <div className="shop-list">
-          {filteredRestaurants.map((item) => (
+          {filteredRestaurants.length === 0 ? (
+            <p className="no-result">영업 중인 가게가 없습니다</p>
+          ) :
+          filteredRestaurants.map((item) => (
             <div className="shop-item">
               <div className="shop-img-placeholder">
                 <img src={item.img_url} alt="" className="rst_img" />
