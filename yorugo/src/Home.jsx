@@ -7,6 +7,7 @@ import profile from "./assets/profile.svg";
 import Search from "./assets/Search.svg";
 import Cash from "./assets/Cash.svg";
 import Card from "./assets/Card.svg";
+import My from "./assets/My.svg";
 import openMarkerSvg from "./assets/Open.svg";
 import closingSoonSvg from "./assets/SoonClosing.svg";
 import closedMarkerSvg from "./assets/Closed.svg";
@@ -427,7 +428,7 @@ function Home({ user }) {
 
         {/* 내 위치 버튼 */}
         <button className="location-btn" onClick={fetchUserLocation}>
-          {loading ? "..." : "📍"}
+          {loading ? "..." : <img src={My}/>}
         </button>
       </main>
 
@@ -441,9 +442,12 @@ function Home({ user }) {
           onMouseDown={handleDragStart}
           onTouchStart={handleDragStart}
         ></div>
-        <h2 className="sheet-title">주변 영업 중인 가게</h2>
+        <h2 className="sheet-title">{filteredRestaurants.length === 0 ? "" : "주변 영업 중인 가게"}</h2>
         <div className="shop-list">
-          {filteredRestaurants.map((item) => (
+          {filteredRestaurants.length === 0 ? (
+            <p className="no-result">영업 중인 가게가 없습니다</p>
+          ) :
+          filteredRestaurants.map((item) => (
             <div className="shop-item">
               <div className="shop-img-placeholder">
                 <img src={item.img_url} alt="" className="rst_img" />

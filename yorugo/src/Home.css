@@ -302,6 +302,8 @@
 .shop-list {
   flex: 1;
   overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }
 
 .shop-item {
@@ -508,4 +510,17 @@
   padding: 2px 6px;
   border-radius: 5px;
   font-weight: bold;
+}
+
+.no-result{
+  flex: 1;
+  color: var(--Gray-62, #9D9D9D);
+  font-family: Pretendard;
+  font-size: 13px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
