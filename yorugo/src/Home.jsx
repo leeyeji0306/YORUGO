@@ -7,6 +7,7 @@ import profile from "./assets/profile.svg";
 import Search from "./assets/Search.svg";
 import Cash from "./assets/Cash.svg";
 import Card from "./assets/Card.svg";
+import My from "./assets/My.svg";
 import openMarkerSvg from "./assets/Open.svg";
 import closingSoonSvg from "./assets/SoonClosing.svg";
 import closedMarkerSvg from "./assets/Closed.svg";
@@ -459,7 +460,7 @@ const filteredRestaurants = restaurant.filter((item) => {
 
         {/* 내 위치 버튼 */}
         <button className="location-btn" onClick={fetchUserLocation}>
-          {loading ? "..." : "📍"}
+          {loading ? "..." : <img src={My}/>}
         </button>
       </main>
 
